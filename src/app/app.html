@@ -1,0 +1,38 @@
+<mat-card appearance="outlined">
+  <mat-card-content id="messages">
+    @for (message of messages(); track $index) {
+      <p>
+        <strong>{{ message.isUser ? 'You' : 'Bot' }}:</strong>
+        {{ message.text }}
+      </p>
+    }
+
+    @if (isLoading()) {
+      <mat-spinner diameter="30"></mat-spinner>
+    }
+  </mat-card-content>
+
+  <mat-card-actions>
+    <mat-form-field appearance="outline" style="flex: 1;">
+      <mat-label>Message</mat-label>
+      <input
+        matInput
+        [ngModel]="userInput()"
+        (ngModelChange)="userInput.set($event)"
+        (keypress)="handleKeyPress($event)"
+        [disabled]="isLoading()"
+      />
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="sendMessage()"
+      [disabled]="!userInput().trim() || isLoading()"
+    >
+      Send
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<router-outlet />
