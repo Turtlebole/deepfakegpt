@@ -23,6 +23,9 @@
   },
   "private": true,
   "packageManager": "npm@11.6.2",
+  "overrides": {
+    "@modelcontextprotocol/sdk": "^1.26.0"
+  },
   "dependencies": {
     "@angular/animations": "^21.1.2",
     "@angular/cdk": "~21.1.2",
@@ -33,6 +36,7 @@
     "@angular/material": "~21.1.2",
     "@angular/platform-browser": "^21.1.0",
     "@angular/router": "^21.1.0",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "rxjs": "~7.8.0",
@@ -40,7 +44,7 @@
   },
   "devDependencies": {
     "@angular/build": "^21.1.1",
-    "@angular/cli": "^21.1.1",
+    "@angular/cli": "^20.0.6",
     "@angular/compiler-cli": "^21.1.0",
     "@angular/material": "^21.1.2",
     "jsdom": "^27.1.0",

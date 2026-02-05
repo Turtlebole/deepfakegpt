@@ -37,7 +37,7 @@ export class App {
   protected readonly title = signal('AI Chatbot');
   protected messages = signal<Message[]>([
     {
-      text: 'Hewwo im ur bot uwu',
+      text: 'test',
       isUser: false,
       timestamp: new Date()
     }
