@@ -1,1 +1,11 @@
-<p>chat-input works!</p>
+<div class="input-container">
+  <input
+    class="message-input"
+    [(ngModel)]="userInput"
+    (keydown)="handleKeyPress($event)"
+    placeholder="Your msg..."
+  />
+  <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim()">
+    <mat-icon>arrow_upward</mat-icon>
+  </button>
+</div>

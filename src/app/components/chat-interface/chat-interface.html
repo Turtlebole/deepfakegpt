@@ -1,1 +1,29 @@
-<p>chat-interface works!</p>
+<div class="chat-wrapper">
+  <header class="chat-header">
+    <span>Something AI</span>
+  </header>
+
+  <main class="messages-container">
+    @if ((chatService.messages$ | async)?.length === 0) {
+      <div class="empty-state">
+        <p>Convo placeholder</p>
+      </div>
+    }
+
+    @for (message of chatService.messages$ | async; track message.id) {
+      <div [class.user-message]="message.isUser" [class.bot-message]="!message.isUser">
+        {{ message.message }}
+      </div>
+    }
+
+    @if (chatService.isLoading$ | async) {
+      <div>
+        <mat-spinner diameter="24"></mat-spinner>
+      </div>
+    }
+  </main>
+
+  <footer class="input-area">
+    <app-chat-input></app-chat-input>
+  </footer>
+</div>
