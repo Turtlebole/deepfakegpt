@@ -1,7 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ChatService } from '../../core/services/chat.service';
 import { ChatInput } from '../chat-input/chat-input';
 
 @Component({
@@ -11,5 +10,5 @@ import { ChatInput } from '../chat-input/chat-input';
   styleUrl: './chat-interface.css',
 })
 export class ChatInterface {
-  protected chatService = inject(ChatService);
+  protected chatInput = viewChild.required(ChatInput);
 }

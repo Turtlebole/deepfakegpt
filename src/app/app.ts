@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { ChatInterface } from './components/chat-interface/chat-interface';
+import { Navbar } from './components/navbar/navbar';
 
 @Component({
   selector: 'app-root',
-  imports: [ChatInterface],
+  imports: [Navbar],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

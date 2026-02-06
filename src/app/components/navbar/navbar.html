@@ -1,0 +1,15 @@
+<mat-toolbar class="bg-primary">
+  <button mat-icon-button (click)="isOpen.set(!isOpen())"   >
+    <mat-icon>{{ isOpen() ? 'close' : 'chat' }}</mat-icon>
+  </button>
+  <span>Something AI</span>
+</mat-toolbar>
+
+<mat-drawer-container>
+  <mat-drawer-content>
+  </mat-drawer-content>
+  
+  <mat-drawer position="end" [opened]="isOpen()">
+    <app-chat-interface></app-chat-interface>
+  </mat-drawer>
+</mat-drawer-container>
