@@ -1,41 +1,13 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { ChatResponse, Conversation } from '../models/chat.models';
+import { map } from 'rxjs';
+import { ChatResponse } from '../models/chat.models';
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ApiService {
-    private readonly baseUrl = '/api';
+    private http = inject(HttpClient);
 
-    constructor(private http: HttpClient) { }
-
-    sendChatMessage(message: string): Observable<string> {
-        return this.http.post<ChatResponse>(`${this.baseUrl}/chat`, { message }).pipe(
-            map(response => {
-                if (response.error) {
-                    throw new Error(response.error);
-                }
-                if (!response.text) {
-                    throw new Error('Server didnt respond yet');
-                }
-                return response.text;
-            }),
-            catchError((error) => {
-                return throwError(() => new Error(error.message));
-            }));
+    sendMessage(message: string) {
+        return this.http.post<ChatResponse>('/api/chat', { message }).pipe(map((response) => response.text));
     }
-
-    /* currently not for use but will be later */
-    getConversations(): Observable<Conversation[]> {
-        return this.http.get<Conversation[]>(`${this.baseUrl}/conversations`).pipe(
-            catchError((error) => {
-                return throwError(() => new Error(error.message));
-            })
-        );
-    }
-
-
 }

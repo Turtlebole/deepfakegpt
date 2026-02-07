@@ -1,21 +1,28 @@
 @use '@angular/material' as mat;
 
+$dark-theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: mat.$violet-palette,
+    tertiary: mat.$violet-palette,
+  ),
+  typography: (
+    brand-family: 'Outfit',
+    plain-family: 'Inter',
+  ),
+  density: (
+    scale: 0,
+  ),
+));
+
 html {
   height: 100%;
-  @include mat.theme((
-    color: (
-      primary: mat.$cyan-palette,
-      tertiary: mat.$blue-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
+  @include mat.all-component-themes($dark-theme);
 }
 
 body {
-  background-color: #0d0d0f;
-  color: #e5e5e5;
-  font: var(--mat-sys-body-medium);
+  background-color: #0f0f0f;
+  color: #f5f5f5;
   margin: 0;
   height: 100%;
 }

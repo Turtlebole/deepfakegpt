@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+::ng-deep .mat-drawer-container {
+  background: transparent !important;
+}
+
+::ng-deep .mat-drawer {
+  background: #0f0f0f !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+::ng-deep .mat-drawer-inner-container {
+  display: flex;
+  flex-direction: column;
+}
