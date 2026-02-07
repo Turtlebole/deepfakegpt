@@ -1,28 +1,61 @@
-<div class="chat-wrapper">
-  <header class="chat-header">
-    <span>Something AI</span>
+<div class="flex flex-col h-full w-full bg-bg-secondary">
+  <header class="relative px-6 py-5 border-b border-border bg-bg-card/50 backdrop-blur-xl">
+    <div class="flex items-center gap-4">
+      <div class="flex-1">
+        <h2 class="text-lg font-semibold text-text-primary font-display">Chatbot</h2>
+      </div>
+    </div>
   </header>
 
-  <main class="messages-container">
-    @if ((chatInput().messages$ | async)?.length === 0) {
-      <div class="empty-state">
-        <p>Convo placeholder</p>
+  <main class="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
+    @if ((messages$ | async)?.length === 0) {
+    <div class="flex-1 flex flex-col justify-center items-center gap-6 animate-fade-in py-12">
+      <div class="text-center">
+        <p class="text-xl font-semibold text-text-primary mb-4 font-display">Start a conversation</p>
       </div>
+      <div class="flex flex-col gap-3">
+        <button (click)="askQuestion('Who is the strongest in Solo Leveling')"
+          class="px-4 py-3 rounded-xl bg-bg-card border border-border hover:border-accent/50 text-sm text-text-secondary hover:text-text-primary transition-all text-left">
+          Who is the strongest in Solo Leveling
+        </button>
+      </div>
+    </div>
     }
 
-    @for (message of chatInput().messages$ | async; track message.id) {
-      <div [class.user-message]="message.isUser" [class.bot-message]="!message.isUser">
-        {{ message.message }}
+    @for (message of messages$ | async; track message.id) {
+    <div class="animate-slide-in flex" [class.justify-end]="message.isUser" [class.justify-start]="!message.isUser">
+      <div class="flex gap-3 max-w-[80%]">
+        <div class="flex flex-col">
+          <div [class]="message.isUser 
+              ? 'px-5 py-3 rounded-2xl rounded-br-md bg-accent text-white' 
+              : 'px-5 py-3 rounded-2xl rounded-bl-md bg-bg-card border border-border text-text-primary'">
+            @if (message.isUser) {
+            <p class="leading-relaxed text-[15px]">{{ message.message }}</p>
+            } @else {
+            <div [innerHTML]="message.message"></div>
+            }
+          </div>
+        </div>
       </div>
+    </div>
     }
 
-    @if (chatInput().isLoading$ | async) {
-      <div>
-        <mat-spinner diameter="24"></mat-spinner>
-      </div>
+    @if (isLoading$ | async) {
+    <div class="flex gap-3 h-8 w-8 animate-fade-in">
+      <mat-spinner></mat-spinner>
+    </div>
     }
   </main>
-  <footer class="input-area">
-    <app-chat-input></app-chat-input>
+
+  <footer class="p-4 border-t border-border bg-bg-card/50 backdrop-blur-xl">
+    <div class="flex items-center gap-3 bg-bg-card rounded-full px-4 py-3 border border-border focus-within:border-accent/50 focus-within:bg-bg-tertiary transition-all duration-300">
+      <input class="flex-1 bg-transparent border-none outline-none text-text-primary placeholder:text-text-muted"
+        [(ngModel)]="userInput" (keydown)="handleKeyPress($event)" placeholder="Your msg..." />
+      <button
+        class="w-10 h-10 rounded-full bg-accent hover:bg-accent-dark text-white flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+        (click)="sendMessage()" [disabled]="!userInput.trim()">
+        <mat-icon class="!text-lg">arrow_upward</mat-icon>
+      </button>
+    </div>
   </footer>
 </div>
