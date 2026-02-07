@@ -1,15 +1,24 @@
-<mat-toolbar class="bg-primary">
-  <button mat-icon-button (click)="isOpen.set(!isOpen())"   >
-    <mat-icon>{{ isOpen() ? 'close' : 'chat' }}</mat-icon>
-  </button>
-  <span>Something AI</span>
-</mat-toolbar>
-
-<mat-drawer-container>
-  <mat-drawer-content>
+<mat-drawer-container class="h-screen bg-bg-primary">
+  <mat-drawer-content class="bg-bg-primary">
+    <nav class="relative z-10 flex items-center justify-between px-8 py-4">
+      <div class="flex items-center gap-4">
+        <button 
+          mat-icon-button 
+          (click)="isOpen.set(!isOpen())" 
+          class="!w-11 !h-11 !rounded-xl">
+          <mat-icon class="!text-accent">{{ isOpen() ? 'close' : 'menu' }}</mat-icon>
+        </button>
+        <div class="flex items-center gap-3">
+          <span class="text-xl font-semibold text-accent font-display">Something AI</span>
+        </div>
+      </div>
+    </nav>
   </mat-drawer-content>
-  
-  <mat-drawer position="end" [opened]="isOpen()">
+
+  <mat-drawer 
+    position="end" 
+    [opened]="isOpen()" 
+    class="!w-[800px]">
     <app-chat-interface></app-chat-interface>
   </mat-drawer>
 </mat-drawer-container>
