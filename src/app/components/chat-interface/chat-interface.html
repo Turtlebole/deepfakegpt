@@ -7,9 +7,7 @@
   <main class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
     @if ((messages | async)?.length === 0) {
     <div class="flex-1 flex flex-col items-center justify-center gap-3 p-8 text-center">
-      <div class="text-5xl mb-2 opacity-80">💬</div>
-      <p class="m-0 text-xl font-semibold text-[var(--text-primary)]">Start a conversation</p>
-      <p class="m-0 text-sm text-[var(--text-muted)]">Ask me anything</p>
+      <p class="m-0 text-xl font-semibold text-[var(--text-primary)]">Test</p>
       <button
         class="mt-4 px-5 py-3 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl text-[var(--text-secondary)] text-sm cursor-pointer transition-all hover:border-[var(--accent)] hover:text-[var(--text-primary)] hover:bg-[var(--accent)]/10"
         (click)="sendMessage(suggestion)">
