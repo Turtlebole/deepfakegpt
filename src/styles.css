@@ -3,19 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #303446;
-  --bg-secondary: #292C3C;
-  --bg-tertiary: #232634;
-  --bg-card: #292C3C;
+  --bg-primary: #0f0f14;
+  --bg-secondary: #16161e;
+  --bg-tertiary: #1a1a24;
+  --bg-card: #1e1e2a;
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-secondary: rgba(255, 255, 255, 0.65);
   --text-muted: rgba(255, 255, 255, 0.4);
   --accent: #F288B7;
   --accent-light: #F5A3C7;
   --accent-dark: #E06A9E;
-  --accent-muted: rgba(242, 136, 183, 0.15);
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-light: rgba(255, 255, 255, 0.15);
+  --border: rgba(255, 255, 255, 0.08);
+  --grid-color: rgba(255, 255, 255, 0.05);
 }
 
 * {
@@ -31,9 +30,24 @@ html, body {
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-position: right -1px;
+  background-size: 23px 23px;
+  mask-image: radial-gradient(circle at 100% 0%, white, transparent 65%);
+  -webkit-mask-image: radial-gradient(circle at 100% 0%, white, transparent 65%);
+  pointer-events: none;
 }
 
 ::-webkit-scrollbar {
@@ -42,7 +56,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -55,21 +69,123 @@ body {
 }
 
 .mat-drawer-container {
-  background: var(--bg-primary) !important;
+  background: transparent !important;
 }
 
 .mat-drawer {
   background: var(--bg-secondary) !important;
 }
 
-.mat-toolbar {
-  background: transparent !important;
-}
-
-.mdc-button {
-  letter-spacing: 0 !important;
-}
-
 .mat-mdc-progress-spinner {
   --mdc-circular-progress-active-indicator-color: var(--accent);
+}
+
+/* Markdown */
+.markdown-content {
+  display: block;
+  line-height: 1.7;
+  font-size: 0.9375rem;
+}
+
+.markdown-content p {
+  margin: 0 0 0.75em 0;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.markdown-content li {
+  margin: 0.25em 0;
+}
+
+.markdown-content code {
+  background: rgba(242, 136, 183, 0.15);
+  color: var(--accent-light);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.markdown-content pre {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0.75em 0;
+  border: 1px solid var(--border);
+}
+
+.markdown-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--text-secondary);
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  font-size: 0.875em;
+}
+
+.markdown-content th,
+.markdown-content td {
+  padding: 0.6em 0.8em;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.markdown-content th {
+  background: rgba(242, 136, 183, 0.1);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.markdown-content tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 0.75em 0;
+  padding-left: 1em;
+  color: var(--text-secondary);
+}
+
+.markdown-content a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  font-weight: 600;
+  margin: 1em 0 0.5em 0;
+  color: var(--text-primary);
+}
+
+.markdown-content h1:first-child,
+.markdown-content h2:first-child,
+.markdown-content h3:first-child,
+.markdown-content h4:first-child {
+  margin-top: 0;
 }

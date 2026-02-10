@@ -1,8 +1,20 @@
+export interface ChartDataPoint {
+    name: string;
+    value: number;
+}
+
+export interface ChartData {
+    type: string;
+    title: string;
+    data: ChartDataPoint[];
+}
+
 export interface ChatMessage {
     id: string;
     message: string;
     timestamp: Date;
     isUser: boolean;
+    charts?: ChartData[];
 }
 
 export interface Conversation {
