@@ -132,6 +132,11 @@ body::before {
   background: none;
   padding: 0;
   color: var(--text-secondary);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875em;
+  line-height: 1.6;
+  display: block;
+  white-space: pre;
 }
 
 .markdown-content table {
@@ -188,4 +193,41 @@ body::before {
 .markdown-content h3:first-child,
 .markdown-content h4:first-child {
   margin-top: 0;
+}
+
+/* Prism syntax highlighting overrides for dark theme */
+.markdown-content pre[class*="language-"] {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid var(--border);
+  padding: 1em !important;
+  margin: 0.75em 0 !important;
+  border-radius: 8px;
+  overflow-x: auto;
+  position: relative;
+}
+
+.markdown-content pre[class*="language-"] code {
+  background: transparent !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 0.875em !important;
+  line-height: 1.6 !important;
+  display: block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  tab-size: 2;
+}
+
+.markdown-content code[class*="language-"] {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 0.875em !important;
+  line-height: 1.6 !important;
+}
+
+/* Ensure Prism tokens are visible */
+.markdown-content pre[class*="language-"] .token {
+  text-shadow: none;
 }

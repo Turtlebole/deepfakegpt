@@ -2,6 +2,18 @@ import 'dotenv/config';
 import express from 'express';
 
 const app = express();
+
+// Enable CORS for frontend container
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use(express.json({ limit: '1mb' }));
 
 app.get('/api/health', (_req, res) => {
@@ -11,7 +23,6 @@ app.get('/api/health', (_req, res) => {
 // SSE streaming endpoint
 app.post('/api/stream', async (req, res) => {
   const message = String(req.body?.message ?? '').trim();
-  
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
@@ -28,7 +39,7 @@ app.post('/api/stream', async (req, res) => {
 
   try {
     const model = process.env.OPENROUTER_MODEL || 'openai/gpt-3.5-turbo';
-    
+
     const upstreamRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -41,8 +52,8 @@ app.post('/api/stream', async (req, res) => {
         model,
         stream: true,
         messages: [
-          { 
-            role: 'assistant', 
+          {
+            role: 'assistant',
             content: `You are a helpful assistant that provides informative responses with markdown formatting.
 
 When presenting numerical data, comparisons, rankings, or statistics, include a chart at the end of your response using this exact format:
@@ -84,7 +95,7 @@ Use markdown for formatting: **bold**, *italic*, lists, tables, code blocks, etc
         if (line.startsWith('data: ')) {
           const data = line.slice(6);
           if (data === '[DONE]') continue;
-          
+
           try {
             const parsed = JSON.parse(data);
             const content = parsed.choices?.[0]?.delta?.content;
@@ -107,7 +118,10 @@ Use markdown for formatting: **bold**, *italic*, lists, tables, code blocks, etc
   }
 });
 
+
 const port = Number(process.env.PORT || 3001);
 app.listen(port, () => {
-  console.log(`[api] listening on http://localhost:${port}`);
+  console.log(`[API] listening on http://localhost:${port}`);
+  console.log(`[API] Received message: ${process.env.PORT}`);
+
 });
