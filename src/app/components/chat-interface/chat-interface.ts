@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MarkdownModule } from 'ngx-markdown';
@@ -24,12 +24,15 @@ export class ChatInterface {
   private readonly messagesSubject$ = new BehaviorSubject<ChatMessage[]>([]);
   private readonly loadingSubject$ = new BehaviorSubject(false);
 
-  protected readonly userInput = new FormControl('', { nonNullable: true });
+  protected readonly userInput = new FormControl('', { validators: [Validators.required] });
   protected readonly messages$ = this.messagesSubject$.asObservable();
   protected readonly isLoading$ = this.loadingSubject$.asObservable();
   protected readonly suggestion = SUGGESTION;
 
-  sendMessage(text = this.userInput.value.trim()): void {
+
+  messages = signal<ChatMessage[]>([]);
+  sendMessage( ) : void {
+    const text = this.userInput?.value?.trim();
     if (!text) return;
 
     this.addMessage({ id: crypto.randomUUID(), message: text, timestamp: new Date(), isUser: true });
@@ -43,7 +46,10 @@ export class ChatInterface {
       scan((fullText, chunk) => fullText + chunk, ''),
       map(content => this.parseCharts(content)),
       finalize(() => this.loadingSubject$.next(false))
-    ).subscribe();
+    ).subscribe((message) => {
+      // const messages = this.messages();
+      // this.messages.update([...messages, message]);
+    });
   }
 
   handleKeyPress(e: KeyboardEvent): void {
