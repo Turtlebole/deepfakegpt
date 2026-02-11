@@ -1,47 +1,40 @@
 <div class="flex flex-col h-full bg-[var(--bg-secondary)]">
   <header
     class="px-6 py-5 border-b border-[var(--border)] bg-gradient-to-b from-[var(--bg-tertiary)] to-[var(--bg-secondary)]">
-    <h2 class="m-0 text-base font-semibold text-[var(--text-primary)] tracking-tight">Chat</h2>
+    <h2 class="text-base font-semibold text-[var(--text-primary)] tracking-tight">Chat</h2>
   </header>
 
   <main class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
-    @if ((messages | async)?.length === 0) {
+    @if ((messages$ | async)?.length === 0) {
     <div class="flex-1 flex flex-col items-center justify-center gap-3 p-8 text-center">
-      <p class="m-0 text-xl font-semibold text-[var(--text-primary)]">Test</p>
+      <p class="text-xl font-semibold text-[var(--text-primary)]">Test</p>
       <button
-        class="mt-4 px-5 py-3 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl text-[var(--text-secondary)] text-sm cursor-pointer transition-all hover:border-[var(--accent)] hover:text-[var(--text-primary)] hover:bg-[var(--accent)]/10"
+        class="pt-4 px-5 py-3 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl text-[var(--text-secondary)] text-sm cursor-pointer transition-all hover:border-[var(--accent)] hover:text-[var(--text-primary)] hover:bg-[var(--accent)]/10"
         (click)="sendMessage(suggestion)">
         {{ suggestion }}
       </button>
     </div>
     }
 
-    @for (msg of messages | async; track msg.id) {
+    @for (msg of messages$ | async; track msg.id) {
     <div class="flex animate-[slideUp_0.3s_ease]" [class.justify-end]="msg.isUser">
-      <div class="max-w-[85%] px-4 py-3.5 rounded-2xl" [class]="msg.isUser 
-            ? 'bg-[var(--accent)] text-white rounded-br-sm' 
-            : ''">
+      <div class="max-w-[85%] px-4 py-3.5 rounded-2xl"
+        [ngClass]="{ 'bg-[var(--accent)] text-white rounded-br-sm': msg.isUser }">
         @if (msg.isUser) {
-        <p class="m-0 leading-relaxed text-[0.9375rem] whitespace-pre-wrap break-words">{{ msg.message }}</p>
+        <p class="leading-relaxed text-[0.9375rem] whitespace-pre-wrap break-words">{{ msg.message }}</p>
         } @else {
         <markdown class="markdown-content" [data]="msg.message"></markdown>
         }
 
         @if (msg.charts?.length && !msg.isUser) {
         @for (chart of msg.charts; track $index) {
-        <div class="mt-4 pt-4 border-t border-[var(--border)]">
-          <h4 class="m-0 mb-3 text-[0.8125rem] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{{
+        <div class="pt-4 border-t border-[var(--border)]">
+          <h4 class="pb-3 text-[0.8125rem] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{{
             chart.title }}</h4>
           <div class="flex flex-col gap-2">
             @for (item of chart.data; track item.name) {
             <div class="flex items-center gap-3">
-              <span class="w-[4.5rem] text-xs text-[var(--text-secondary)] truncate shrink-0">{{ item.name }}</span>
-              <div class="flex-1 h-1.5 bg-white/5 rounded-sm overflow-hidden">
-                <div
-                  class="h-full bg-gradient-to-r from-[var(--accent-dark)] to-[var(--accent)] rounded-sm transition-all duration-500"
-                  [style.width.%]="(item.value / getMaxValue(chart.data)) * 100">
-                </div>
-              </div>
+              <span class="w-[72px] text-xs text-[var(--text-secondary)] truncate shrink-0">{{ item.name }}</span>
             </div>
             }
           </div>
@@ -52,7 +45,7 @@
     </div>
     }
 
-    @if (isLoading | async) {
+    @if (isLoading$ | async) {
     <div class="flex py-2">
       <mat-spinner class="!w-6 !h-6"></mat-spinner>
     </div>
@@ -62,11 +55,11 @@
   <footer class="px-6 py-4 pb-6 bg-gradient-to-t from-[var(--bg-tertiary)] to-[var(--bg-secondary)]">
     <div
       class="flex items-center gap-3 pl-4 pr-2 py-2 bg-[var(--bg-card)] border border-[var(--border)] rounded-3xl transition-all focus-within:border-[var(--accent)] focus-within:shadow-[0_0_0_3px_rgba(242,136,183,0.1)]">
-      <input type="text" [(ngModel)]="userInput" (keydown)="handleKeyPress($event)" placeholder="Type a message..."
+      <input type="text" [formControl]="userInput" (keydown)="handleKeyPress($event)" placeholder="Type a message..."
         class="flex-1 border-none bg-transparent outline-none text-[var(--text-primary)] text-[0.9375rem] placeholder:text-[var(--text-muted)]" />
       <button
         class="w-9 h-9 rounded-full border-none bg-[var(--accent)] text-white cursor-pointer flex items-center justify-center transition-all shrink-0 hover:enabled:bg-[var(--accent-dark)] hover:enabled:scale-105 disabled:opacity-30 disabled:cursor-not-allowed"
-        (click)="sendMessage()" [disabled]="!userInput.trim()">
+        (click)="sendMessage()" [disabled]="!userInput.value.trim()">
         <mat-icon class="!text-lg !w-[18px] !h-[18px]">arrow_upward</mat-icon>
       </button>
     </div>
