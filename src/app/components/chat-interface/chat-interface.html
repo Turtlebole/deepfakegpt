@@ -36,6 +36,8 @@
                     @for (item of chart.data; track item.name) {
                       <div class="flex items-center gap-3">
                         <span class="w-[72px] text-xs text-[var(--text-secondary)] truncate shrink-0">{{ item.name }}</span>
+                        <p>-----------</p>
+                        <span class="w-[72px] text-xs text-[var(--text-secondary)] truncate shrink-0">{{ item.value }}</span>
                       </div>
                     }
                   </li>
