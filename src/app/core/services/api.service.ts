@@ -1,15 +1,12 @@
-import {HttpClient, HttpEvent, HttpEventType} from '@angular/common/http';
-import {Injectable, inject, NgZone} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Injectable, inject} from '@angular/core';
 import { Observable } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
 
-const message = 'Who is the strongest in Solo Leveling';
-
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly ngZone = inject(NgZone);
   private processedLength = 0;
   private baseUrl = environment.baseUrl;
 
@@ -55,22 +52,19 @@ export class ApiService {
 
   private parseSSE(data: string): string[] {
     const chunks: string[] = [];
-    const events = data.split('\n\n').filter(e => e.trim());
-    for (const event of events) {
-      const lines = event.split('\n');
-      let eventType = '';
-      let eventData = '';
+    const lines = data.split('\n');
 
-      for (const line of lines) {
-        if (line.startsWith('event: ')) {
-          eventType = line.slice(7).trim();
-        } else if (line.startsWith('data: ')) {
-          eventData = line.slice(6).trim();
+    let currentEventType = '';
+
+    for (const line of lines) {
+      if (line.startsWith('event:')) {
+        currentEventType = line.slice(6).trim();
+      } else if (line.startsWith('data:')) {
+        const eventData = line.slice(5);
+        if ((currentEventType === 'progress' || currentEventType === '') && eventData) {
+          chunks.push(eventData);
         }
-      }
-
-      if ((eventType === 'progress' || !eventType) && eventData) {
-        chunks.push(eventData + '\n');
+        currentEventType = ''; // reset for next event
       }
     }
 

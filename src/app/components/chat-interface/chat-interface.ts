@@ -8,7 +8,7 @@ import { BehaviorSubject } from 'rxjs';
 import { finalize, map, scan } from 'rxjs/operators';
 
 import { ApiService } from '../../core/services/api.service';
-import { ChatMessage, ChartData, ChartDataPoint } from '../../core/models/chat.models';
+import { ChatMessage, ChartData } from '../../core/models/chat.models';
 
 const SUGGESTION = 'Who is the strongest in Solo Leveling';
 
@@ -19,36 +19,38 @@ const SUGGESTION = 'Who is the strongest in Solo Leveling';
   templateUrl: './chat-interface.html',
   styleUrl: './chat-interface.css',
 })
+
 export class ChatInterface {
   private readonly api = inject(ApiService);
   private readonly messagesSubject$ = new BehaviorSubject<ChatMessage[]>([]);
   private readonly loadingSubject$ = new BehaviorSubject(false);
 
   protected readonly userInput = new FormControl('', { validators: [Validators.required] });
-  protected readonly messages$ = this.messagesSubject$.asObservable();
   protected readonly isLoading$ = this.loadingSubject$.asObservable();
   protected readonly suggestion = SUGGESTION;
+  protected messages = signal<ChatMessage[]>([]);
 
+  sendMessage(text?: string): void {
+    const messageText = text || this.userInput?.value?.trim();
+    if (!messageText) return;
 
-  messages = signal<ChatMessage[]>([]);
-  sendMessage( ) : void {
-    const text = this.userInput?.value?.trim();
-    if (!text) return;
-
-    this.addMessage({ id: crypto.randomUUID(), message: text, timestamp: new Date(), isUser: true });
+    this.addMessage({ id: crypto.randomUUID(), message: messageText, timestamp: new Date(), isUser: true });
     this.userInput.reset();
     this.loadingSubject$.next(true);
 
     const botId = crypto.randomUUID();
     this.addMessage({ id: botId, message: '', timestamp: new Date(), isUser: false, charts: [] });
 
-    this.api.streamMessage(text).pipe(
+    this.api.streamMessage(messageText).pipe(
       scan((fullText, chunk) => fullText + chunk, ''),
       map(content => this.parseCharts(content)),
       finalize(() => this.loadingSubject$.next(false))
-    ).subscribe((message) => {
-      // const messages = this.messages();
-      // this.messages.update([...messages, message]);
+    ).subscribe((parsed) => {
+      this.messages.update((msgs) => msgs.map(m => (
+        m.id === botId
+          ? { ...m, message: parsed.text, charts: parsed.charts }
+          : m
+      )));
     });
   }
 
@@ -59,15 +61,15 @@ export class ChatInterface {
     }
   }
 
-  private addMessage(msg: ChatMessage): void {
-    this.messagesSubject$.next([...this.messagesSubject$.value, msg]);
+  private addMessage(message: ChatMessage): void {
+    this.messagesSubject$.next([...this.messagesSubject$.value, message]);
+    this.messages.update((messages) => [...messages, message]);
   }
 
   private parseCharts(text: string): { text: string; charts: ChartData[] } {
     const charts: ChartData[] = [];
     const cleaned = text.replace(/<chart>([\s\S]*?)<\/chart>/g, (_, json) => {
       try {
-        console.log('json test', json);
         const parsed = JSON.parse(json);
         if (parsed?.data?.length) {
           charts.push({ type: parsed.type || 'bar', title: parsed.title || 'Chart', data: parsed.data });
