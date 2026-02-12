@@ -5,7 +5,7 @@
   </header>
 
   <main class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
-    @if ((messages$ | async)?.length === 0) {
+    @if (messages().length === 0) {
     <div class="flex-1 flex flex-col items-center justify-center gap-3 p-8 text-center">
       <p class="text-xl font-semibold text-[var(--text-primary)]">Test</p>
       <button
@@ -16,30 +16,33 @@
     </div>
     }
 
-    @for (msg of messages$ | async; track msg.id) {
-    <div class="flex animate-[slideUp_0.3s_ease]" [class.justify-end]="msg.isUser">
+    @for (message of messages(); track message.id) {
+    <div class="flex animate-[slideUp_0.3s_ease]" [class.justify-end]="message.isUser">
       <div class="max-w-[85%] px-4 py-3.5 rounded-2xl"
-        [ngClass]="{ 'bg-[var(--accent)] text-white rounded-br-sm': msg.isUser }">
-        @if (msg.isUser) {
-        <p class="leading-relaxed text-[0.9375rem] whitespace-pre-wrap break-words">{{ msg.message }}</p>
+        [ngClass]="{ 'bg-[var(--accent)] text-white rounded-br-sm': message.isUser }">
+        @if (message.isUser) {
+        <p class="leading-relaxed text-[0.9375rem] whitespace-pre-wrap break-words">{{ message.message }}</p>
         } @else {
-        <markdown class="markdown-content" [data]="msg.message"></markdown>
+        <markdown class="markdown-content" [data]="message.message"></markdown>
         }
 
-        @if (msg.charts?.length && !msg.isUser) {
-        @for (chart of msg.charts; track $index) {
-        <div class="pt-4 border-t border-[var(--border)]">
-          <h4 class="pb-3 text-[0.8125rem] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{{
-            chart.title }}</h4>
-          <div class="flex flex-col gap-2">
-            @for (item of chart.data; track item.name) {
-            <div class="flex items-center gap-3">
-              <span class="w-[72px] text-xs text-[var(--text-secondary)] truncate shrink-0">{{ item.name }}</span>
+        @if (message.charts?.length && !message.isUser) {
+          @for (chart of message.charts; track chart.title) {
+            <div class="pt-4 border-t border-[var(--border)]">
+              <h4 class="pb-3 text-[0.8125rem] font-semibold text-[var(--text-secondary)]">{{ chart.title }}</h4>
+              <div class="flex flex-col gap-2">
+                <ol class="list-decimal list-inside flex flex-col gap-2">
+                  <li class="flex flex-col gap-2">
+                    @for (item of chart.data; track item.name) {
+                      <div class="flex items-center gap-3">
+                        <span class="w-[72px] text-xs text-[var(--text-secondary)] truncate shrink-0">{{ item.name }}</span>
+                      </div>
+                    }
+                  </li>
+                </ol>
+              </div>
             </div>
-            }
-          </div>
-        </div>
-        }
+          }
         }
       </div>
     </div>
