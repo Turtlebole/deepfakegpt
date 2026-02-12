@@ -8,7 +8,7 @@ import { BehaviorSubject } from 'rxjs';
 import { finalize, map, scan } from 'rxjs/operators';
 
 import { ApiService } from '../../core/services/api.service';
-import { ChatMessage, ChartData } from '../../core/models/chat.models';
+import { ChatMessage } from '../../core/models/chat.models';
 
 const SUGGESTION = 'Who is the strongest in Solo Leveling';
 
@@ -39,24 +39,25 @@ export class ChatInterface {
     this.loadingSubject$.next(true);
 
     const botId = crypto.randomUUID();
-    this.addMessage({ id: botId, message: '', timestamp: new Date(), isUser: false, charts: [] });
+    this.addMessage({ id: botId, message: '', timestamp: new Date(), isUser: false, charts: [], tables: [] });
 
     this.api.streamMessage(messageText).pipe(
       scan((fullText, chunk) => fullText + chunk, ''),
-      map(content => this.parseCharts(content)),
+      map(content => this.api.parseContent(content)),
       finalize(() => this.loadingSubject$.next(false))
     ).subscribe((parsed) => {
-      this.messages.update((msgs) => msgs.map(m => (
-        m.id === botId
-          ? { ...m, message: parsed.text, charts: parsed.charts }
-          : m
-      )));
+      this.messages.update((messages) => messages.map(message => {
+        if (message.id === botId) {
+          return { ...message, message: parsed.text, charts: parsed.charts, tables: parsed.tables };
+        }
+        return message;
+      }));
     });
   }
 
-  handleKeyPress(e: KeyboardEvent): void {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+  handleKeyPress(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
       this.sendMessage();
     }
   }
@@ -64,19 +65,5 @@ export class ChatInterface {
   private addMessage(message: ChatMessage): void {
     this.messagesSubject$.next([...this.messagesSubject$.value, message]);
     this.messages.update((messages) => [...messages, message]);
-  }
-
-  private parseCharts(text: string): { text: string; charts: ChartData[] } {
-    const charts: ChartData[] = [];
-    const cleaned = text.replace(/<chart>([\s\S]*?)<\/chart>/g, (_, json) => {
-      try {
-        const parsed = JSON.parse(json);
-        if (parsed?.data?.length) {
-          charts.push({ type: parsed.type || 'bar', title: parsed.title || 'Chart', data: parsed.data });
-        }
-      } catch { }
-      return '';
-    });
-    return { text: cleaned.trim(), charts };
   }
 }

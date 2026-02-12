@@ -28,22 +28,41 @@
 
         @if (message.charts?.length && !message.isUser) {
           @for (chart of message.charts; track chart.title) {
-            <div class="pt-4 border-t border-[var(--border)]">
-              <h4 class="pb-3 text-[0.8125rem] font-semibold text-[var(--text-secondary)]">{{ chart.title }}</h4>
+            <div class="mt-4">
+              <h4 class="mb-2 text-sm font-medium text-[var(--text-secondary)]">{{ chart.title }}</h4>
               <div class="flex flex-col gap-2">
-                <ol class="list-decimal list-inside flex flex-col gap-2">
-                  <li class="flex flex-col gap-2">
-                    @for (item of chart.data; track item.name) {
-                      <div class="flex items-center gap-3">
-                        <span class="w-[72px] text-xs text-[var(--text-secondary)] truncate shrink-0">{{ item.name }}</span>
-                        <p>-----------</p>
-                        <span class="w-[72px] text-xs text-[var(--text-secondary)] truncate shrink-0">{{ item.value }}</span>
-                      </div>
-                    }
-                  </li>
-                </ol>
+                @for (item of chart.data; track item.name) {
+                  <div class="flex items-center gap-3">
+                    <span class="text-xs text-[var(--text-secondary)]">{{ item.name }}</span>
+                    <span class="text-xs text-[var(--text-muted)]">—</span>
+                    <span class="text-xs text-[var(--text-secondary)]">{{ item.value }}</span>
+                  </div>
+                }
               </div>
             </div>
+          }
+        }
+
+        @if (message.tables?.length && !message.isUser) {
+          @for (table of message.tables; track table.id) {
+            <table class="w-full text-sm mt-4">
+              <thead>
+              <tr>
+                @for (column of table.columns; track column) {
+                  <th class="text-left">{{ column }}</th>
+                }
+              </tr>
+              </thead>
+              <tbody>
+                @for (row of table.rows; track $index) {
+                  <tr>
+                    @for (cell of row; track $index) {
+                      <td>{{ cell }}</td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
           }
         }
       </div>
