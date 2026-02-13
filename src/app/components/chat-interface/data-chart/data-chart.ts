@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MarkdownModule } from 'ngx-markdown';
-import { ChatMessage } from '../../core/models/chat.models';
-import { DataTableComponent } from '../data-table/data-table';
+import { ChatMessage } from '../chat.models';
+import { DataTableComponent } from './data-table/data-table';
 
 @Component({
   selector: 'app-data-chart',

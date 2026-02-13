@@ -3,7 +3,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { ChatInterface } from '../chat-interface/chat-interface';
+import { ChatInterface } from '../../../components/chat-interface/chat-interface';
 
 @Component({
   selector: 'app-navbar',

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableData } from '../../core/models/chat.models';
+import { TableData } from '../../chat.models';
 
 @Component({
   selector: 'app-data-table',

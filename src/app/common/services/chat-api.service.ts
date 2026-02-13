@@ -3,7 +3,7 @@ import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {filter, map, switchMap} from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
-import {ChartData, TableData, TableCellValue} from '../models/chat.models';
+import {ChartData, TableData, TableCellValue} from '../../components/chat-interface/chat.models';
 
 export interface ParsedContent {
   text: string;
