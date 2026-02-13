@@ -1,0 +1,30 @@
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.mat-drawer.drawer {
+  width: min(480px, 100vw);
+  background: var(--bg-secondary) !important;
+  border-left: 1px solid var(--border) !important;
+  box-shadow:
+    -16px 0 48px rgba(0, 0, 0, 0.5),
+    -4px 0 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+.mat-drawer-inner-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mat-drawer-backdrop.mat-drawer-shown {
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(8px);
+}
+
+.mat-drawer.drawer {
+  overflow: visible !important;
+}
+
