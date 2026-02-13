@@ -1,6 +1,6 @@
 <div class="flex animate-[slideUp_0.3s_ease]" [class.justify-end]="message.isUser">
   <div class="max-w-[85%] px-4 py-3.5 rounded-2xl"
-    [ngClass]="{ 'bg-[var(--accent)] text-white rounded-br-sm': message.isUser }">
+       [ngClass]="{ 'bg-[var(--accent)] text-white rounded-br-sm': message.isUser }">
 
     @if (message.isUser) {
       <p class="leading-relaxed text-[0.9375rem] whitespace-pre-wrap break-words">{{ message.message }}</p>
@@ -27,7 +27,7 @@
 
     @if (message.tables?.length && !message.isUser) {
       @for (table of message.tables; track table.id) {
-        <app-data-table [table]="table" class="mt-4 block" />
+        <app-data-table [table]="table" class="mt-4 block"/>
       }
     }
   </div>
