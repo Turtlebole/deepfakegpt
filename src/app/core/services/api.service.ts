@@ -1,14 +1,20 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable, inject} from '@angular/core';
-import { Observable } from 'rxjs';
-import { filter, map, switchMap } from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {filter, map, switchMap} from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
-import { ChartData, TableData, TableCellValue } from '../models/chat.models';
+import {ChartData, TableData, TableCellValue} from '../models/chat.models';
 
 export interface ParsedContent {
   text: string;
   charts: ChartData[];
   tables: TableData[];
+}
+
+enum SSEEventType {
+  EVENT = 'event',
+  DATA = 'data',
+  PROGRESS = 'progress'
 }
 
 @Injectable({ providedIn: 'root' })
@@ -25,9 +31,11 @@ export class ApiService {
         if (e.type === 1) {
           console.log('[API] send req to api/stream');
         }
+
         if (e.type === 4) {
           console.log('[API] req done');
         }
+
         if (e.type === 0) {
           console.error('[API] req error:', e);
         }
@@ -36,6 +44,7 @@ export class ApiService {
       }),
       map((e: any) => {
         const newData = this.extractNewData(e.partialText);
+
         if (newData) {
           console.log('[API] received this data chunk:', newData.substring(0, 50));
         }
@@ -60,20 +69,27 @@ export class ApiService {
   private parseSSE(data: string): string[] {
     const chunks: string[] = [];
     const lines = data.split('\n');
-
     let currentEventType = '';
 
-    for (const line of lines) {
-      if (line.startsWith('event:')) {
-        currentEventType = line.slice(6).trim();
-      } else if (line.startsWith('data:')) {
-        const eventData = line.slice(5);
-        if ((currentEventType === 'progress' || currentEventType === '') && eventData) {
-          chunks.push(eventData);
-        }
-        currentEventType = '';
+    lines.forEach(line => {
+      if (!line) return;
+
+      const [prefix, ...rest] = line.split(':');
+      const content = rest.join(':').trim();
+
+      switch (prefix) {
+        case SSEEventType.EVENT:
+          currentEventType = content;
+          break;
+
+        case SSEEventType.DATA:
+          if ((currentEventType === SSEEventType.PROGRESS || currentEventType === '') && content) {
+            chunks.push(content);
+          }
+          currentEventType = '';
+          break;
       }
-    }
+    });
 
     return chunks;
   }
@@ -82,9 +98,11 @@ export class ApiService {
     const charts: ChartData[] = [];
     const tables: TableData[] = [];
 
-    let cleaned = this.parseCharts(text, charts, tables);
-    cleaned = this.parseTables(cleaned, tables);
-    cleaned = this.parseMarkdownTables(cleaned, tables);
+    const cleaned = [
+      (content: string) => this.parseCharts(content, charts, tables),
+      (content: string) => this.parseTables(content, tables),
+      (content: string) => this.parseMarkdownTables(content, tables)
+    ].reduce((processedText, parser) => parser(processedText), text);
 
     return { text: cleaned.trim(), charts, tables };
   }
@@ -94,13 +112,14 @@ export class ApiService {
       try {
         const parsed = JSON.parse(json);
         if (parsed?.data?.length) {
-          charts.push({ type: parsed.type || 'bar', title: parsed.title || 'Chart', data: parsed.data });
+          charts.push({type: parsed.type || 'bar', title: parsed.title || 'Chart', data: parsed.data});
           tables.push(this.dataToTable(parsed.data, parsed.title ? `${parsed.title} (Data)` : undefined));
           return '';
         }
       } catch {
         return `<chart>${json}</chart>`;
       }
+
       return '';
     });
   }
@@ -147,7 +166,7 @@ export class ApiService {
         .map(cells => cells.map(this.coerceValue));
 
       if (columns.length && rows.length) {
-        tables.push({ id: crypto.randomUUID(), columns, rows });
+        tables.push({id: crypto.randomUUID(), columns, rows});
         text = text.replace(match[0], '');
       }
     }
@@ -158,7 +177,7 @@ export class ApiService {
   private dataToTable(data: any[], title?: string, summary?: string, sourceId?: string): TableData {
     const columns = Object.keys(data[0]);
     const rows = data.map(item => columns.map(col => this.coerceValue(item[col])));
-    return { id: crypto.randomUUID(), columns, rows, title, summary, sourceId };
+    return {id: crypto.randomUUID(), columns, rows, title, summary, sourceId};
   }
 
   private coerceValue = (value: unknown): TableCellValue => {
