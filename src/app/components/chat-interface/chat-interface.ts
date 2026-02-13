@@ -6,10 +6,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BehaviorSubject } from 'rxjs';
 import { finalize, map, scan } from 'rxjs/operators';
 
-import { ApiService } from '../../core/services/api.service';
-import { ChatMessage } from '../../core/models/chat.models';
-import { DataChartComponent } from '../data-chart/data-chart';
-import { noWhitespaceValidator } from '../../core/validators/validators';
+import { ApiService } from '../../common/services/chat-api.service';
+import { ChatMessage } from './chat.models';
+import { DataChartComponent } from './data-chart/data-chart';
+import { noWhitespaceValidator } from '../../common/utils/validators';
 
 const SUGGESTION = 'Who is the strongest in Solo Leveling';
 
