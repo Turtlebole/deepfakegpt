@@ -3,19 +3,20 @@ import { CommonModule } from '@angular/common';
 import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MarkdownModule } from 'ngx-markdown';
 import { BehaviorSubject } from 'rxjs';
 import { finalize, map, scan } from 'rxjs/operators';
 
 import { ApiService } from '../../core/services/api.service';
 import { ChatMessage } from '../../core/models/chat.models';
+import { DataChartComponent } from '../data-chart/data-chart';
+import { noWhitespaceValidator } from '../../core/validators/validators';
 
 const SUGGESTION = 'Who is the strongest in Solo Leveling';
 
 @Component({
   selector: 'app-chat-interface',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatProgressSpinnerModule, MarkdownModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatProgressSpinnerModule, DataChartComponent],
   templateUrl: './chat-interface.html',
   styleUrl: './chat-interface.css',
 })
@@ -25,13 +26,13 @@ export class ChatInterface {
   private readonly messagesSubject$ = new BehaviorSubject<ChatMessage[]>([]);
   private readonly loadingSubject$ = new BehaviorSubject(false);
 
-  protected readonly userInput = new FormControl('', { validators: [Validators.required] });
+  protected readonly userInput = new FormControl('', { validators: [Validators.required, noWhitespaceValidator] });
   protected readonly isLoading$ = this.loadingSubject$.asObservable();
   protected readonly suggestion = SUGGESTION;
   protected messages = signal<ChatMessage[]>([]);
 
   sendMessage(text?: string): void {
-    const messageText = text || this.userInput?.value?.trim();
+    const messageText = text || (this.userInput.valid ? this.userInput.value : null);
     if (!messageText) return;
 
     this.addMessage({ id: crypto.randomUUID(), message: messageText, timestamp: new Date(), isUser: true });
