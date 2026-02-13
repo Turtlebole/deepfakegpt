@@ -60,12 +60,6 @@ export class ApiService {
     );
   }
 
-  private extractNewData(text: string): string {
-    const newData = text.slice(this.processedLength);
-    this.processedLength = text.length;
-    return newData;
-  }
-
   private parseSSE(data: string): string[] {
     const chunks: string[] = [];
     const lines = data.split('\n');

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { BehaviorSubject } from 'rxjs';
 import { finalize, map, scan } from 'rxjs/operators';
 
 import { ApiService } from '../../common/services/chat-api.service';
@@ -23,13 +22,11 @@ const SUGGESTION = 'Who is the strongest in Solo Leveling';
 
 export class ChatInterface {
   private readonly api = inject(ApiService);
-  private readonly messagesSubject$ = new BehaviorSubject<ChatMessage[]>([]);
-  private readonly loadingSubject$ = new BehaviorSubject(false);
 
   protected readonly userInput = new FormControl('', { validators: [Validators.required, noWhitespaceValidator] });
-  protected readonly isLoading$ = this.loadingSubject$.asObservable();
   protected readonly suggestion = SUGGESTION;
-  protected messages = signal<ChatMessage[]>([]);
+  protected readonly isLoading = signal(false);
+  protected readonly messages = signal<ChatMessage[]>([]);
 
   sendMessage(text?: string): void {
     const messageText = text || (this.userInput.valid ? this.userInput.value : null);
@@ -37,15 +34,15 @@ export class ChatInterface {
 
     this.addMessage({ id: crypto.randomUUID(), message: messageText, timestamp: new Date(), isUser: true });
     this.userInput.reset();
-    this.loadingSubject$.next(true);
+    this.isLoading.set(true);
 
     const botId = crypto.randomUUID();
     this.addMessage({ id: botId, message: '', timestamp: new Date(), isUser: false, charts: [], tables: [] });
 
     this.api.streamMessage(messageText).pipe(
       scan((fullText, chunk) => fullText + chunk, ''),
-      map(content => this.api.parseContent(content)),
-      finalize(() => this.loadingSubject$.next(false))
+      map(fullText => this.api.parseContent(fullText)),
+      finalize(() => this.isLoading.set(false))
     ).subscribe((parsed) => {
       this.messages.update((messages) => messages.map(message => {
         if (message.id === botId) {
@@ -64,7 +61,6 @@ export class ChatInterface {
   }
 
   private addMessage(message: ChatMessage): void {
-    this.messagesSubject$.next([...this.messagesSubject$.value, message]);
     this.messages.update((messages) => [...messages, message]);
   }
 }

@@ -20,7 +20,7 @@
       <app-data-chart [message]="message"/>
     }
 
-    @if (isLoading$ | async) {
+    @if (isLoading()) {
       <div class="flex py-2">
         <mat-spinner class="!w-6 !h-6"></mat-spinner>
       </div>

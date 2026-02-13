@@ -1,35 +1,33 @@
-<div class="flex animate-[slideUp_0.3s_ease]" [class.justify-end]="message.isUser">
+<div class="flex" [class.justify-end]="message.isUser">
   <div class="max-w-[85%] px-4 py-3.5 rounded-2xl"
        [ngClass]="{ 'bg-[var(--accent)] text-white rounded-br-sm': message.isUser }">
 
-    @if (message.isUser) {
-      <p class="leading-relaxed text-[0.9375rem] whitespace-pre-wrap break-words">{{ message.message }}</p>
-    } @else {
-      <markdown class="markdown-content" [data]="message.message"></markdown>
-    }
-
-    @if (message.charts?.length && !message.isUser) {
-      @for (chart of message.charts; track chart.title) {
-        <div class="mt-4">
-          <h4 class="mb-2 text-sm font-medium text-[var(--text-secondary)]">{{ chart.title }}</h4>
-          <div class="flex flex-col gap-2">
-            @for (item of chart.data; track item.name) {
-              <div class="flex items-center gap-3">
-                <div class="text-xs text-[var(--text-secondary)]">{{ item.name }}</div>
-                <div class="text-xs text-[var(--text-muted)]">—</div>
-                <div class="text-xs text-[var(--text-secondary)]">{{ item.value }}</div>
-              </div>
-            }
+    @switch (getContentType()) {
+      @case ('user') {
+        <p class="leading-relaxed text-[1rem] break-words">{{ message.message }}</p>
+      }
+      @case ('chart') {
+        <markdown class="markdown-content" [data]="message.message"></markdown>
+        @for (chart of parseCharts(); track chart.title) {
+          <div class="chart-container mt-4">
+            <p class="font-semibold mb-2">{{ chart.title }}</p>
+            <p class="text-sm text-gray-600">Chart type: {{ chart.type }}</p>
+            <!-- Add your chart visualization component here -->
+            <pre class="text-xs mt-2">{{ chart.data | json }}</pre>
           </div>
-        </div>
+        }
+      }
+      @case ('table') {
+        <markdown class="markdown-content" [data]="message.message"></markdown>
+        @for (table of parseTables(); track table.id) {
+          <app-data-table [table]="table"/>
+        }
+      }
+      @case ('text') {
+        <markdown class="markdown-content" [data]="message.message"></markdown>
       }
     }
 
-    @if (message.tables?.length && !message.isUser) {
-      @for (table of message.tables; track table.id) {
-        <app-data-table [table]="table" class="mt-4 block"/>
-      }
-    }
   </div>
 </div>
 
