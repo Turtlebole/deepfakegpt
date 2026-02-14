@@ -20,11 +20,14 @@ export interface TableData {
     sourceId?: string;
 }
 
+export type MessageRole = 'user' | 'assistant' | 'system';
+
 export interface ChatMessage {
     id: string;
     message: string;
     timestamp: Date;
     isUser: boolean;
+    role: MessageRole;
     charts?: ChartData[];
     tables?: TableData[];
 }

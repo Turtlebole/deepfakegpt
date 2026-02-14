@@ -1,33 +1,29 @@
-<div class="flex" [class.justify-end]="message.isUser">
+<div class="flex" [ngClass]="{ 'justify-end': message.role === 'user' }">
   <div class="max-w-[85%] px-4 py-3.5 rounded-2xl"
-       [ngClass]="{ 'bg-[var(--accent)] text-white rounded-br-sm': message.isUser }">
+       [ngClass]="{ 'bg-[var(--accent)] text-white rounded-br-sm': message.role === 'user' }">
 
     @switch (getContentType()) {
       @case ('user') {
         <p class="leading-relaxed text-[1rem] break-words">{{ message.message }}</p>
       }
-      @case ('chart') {
+      @case ('special') {
         <markdown class="markdown-content" [data]="message.message"></markdown>
-        @for (chart of parseCharts(); track chart.title) {
+
+        @for (chart of getCharts(); track chart.title) {
           <div class="chart-container mt-4">
             <p class="font-semibold mb-2">{{ chart.title }}</p>
-            <p class="text-sm text-gray-600">Chart type: {{ chart.type }}</p>
-            <!-- Add your chart visualization component here -->
             <pre class="text-xs mt-2">{{ chart.data | json }}</pre>
           </div>
         }
-      }
-      @case ('table') {
-        <markdown class="markdown-content" [data]="message.message"></markdown>
-        @for (table of parseTables(); track table.id) {
+
+        @for (table of getTables(); track table.id) {
           <app-data-table [table]="table"/>
         }
       }
-      @case ('text') {
+      @default {
         <markdown class="markdown-content" [data]="message.message"></markdown>
       }
     }
-
   </div>
 </div>
 

@@ -7,7 +7,7 @@ import { finalize, map, scan } from 'rxjs/operators';
 
 import { ApiService } from '../../common/services/chat-api.service';
 import { ChatMessage } from './chat.models';
-import { DataChartComponent } from './data-chart/data-chart';
+import { DataChartComponent } from './chat-interface-renderer/chat-interface-renderer';
 import { noWhitespaceValidator } from '../../common/utils/validators';
 
 const SUGGESTION = 'Who is the strongest in Solo Leveling';
@@ -32,12 +32,12 @@ export class ChatInterface {
     const messageText = text || (this.userInput.valid ? this.userInput.value : null);
     if (!messageText) return;
 
-    this.addMessage({ id: crypto.randomUUID(), message: messageText, timestamp: new Date(), isUser: true });
+    this.addMessage({ id: crypto.randomUUID(), message: messageText, timestamp: new Date(), isUser: true, role: 'user' });
     this.userInput.reset();
     this.isLoading.set(true);
 
     const botId = crypto.randomUUID();
-    this.addMessage({ id: botId, message: '', timestamp: new Date(), isUser: false, charts: [], tables: [] });
+    this.addMessage({ id: botId, message: '', timestamp: new Date(), isUser: false, role: 'assistant', charts: [], tables: [] });
 
     this.api.streamMessage(messageText).pipe(
       scan((fullText, chunk) => fullText + chunk, ''),

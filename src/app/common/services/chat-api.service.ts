@@ -1,9 +1,9 @@
-import {HttpClient} from '@angular/common/http';
-import {Injectable, inject} from '@angular/core';
-import {Observable} from 'rxjs';
-import {filter, map, switchMap} from 'rxjs/operators';
-import {environment} from '../../../environments/environment';
-import {ChartData, TableData, TableCellValue} from '../../components/chat-interface/chat.models';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+import { ChartData, TableData, TableCellValue } from '../../components/chat-interface/chat.models';
 
 export interface ParsedContent {
   text: string;
@@ -26,7 +26,7 @@ export class ApiService {
   streamMessage(message: string): Observable<string> {
     this.processedLength = 0;
 
-      return this.http.post(`${this.baseUrl}/api/stream`, { message }, { responseType: 'text', observe: 'events', reportProgress: true }).pipe(
+    return this.http.post(`${this.baseUrl}/api/stream`, { message }, { responseType: 'text', observe: 'events', reportProgress: true }).pipe(
       filter((e: any) => {
         if (e.type === 1) {
           console.log('[API] send req to api/stream');
@@ -58,6 +58,12 @@ export class ApiService {
         return parsed;
       })
     );
+  }
+
+  private extractNewData(text: string): string {
+    const newData = text.slice(this.processedLength);
+    this.processedLength = text.length;
+    return newData;
   }
 
   private parseSSE(data: string): string[] {
@@ -106,7 +112,7 @@ export class ApiService {
       try {
         const parsed = JSON.parse(json);
         if (parsed?.data?.length) {
-          charts.push({type: parsed.type || 'bar', title: parsed.title || 'Chart', data: parsed.data});
+          charts.push({ type: parsed.type || 'bar', title: parsed.title || 'Chart', data: parsed.data });
           tables.push(this.dataToTable(parsed.data, parsed.title ? `${parsed.title} (Data)` : undefined));
           return '';
         }
@@ -122,21 +128,8 @@ export class ApiService {
     return text.replace(/<table>([\s\S]*?)<\/table>/g, (_, json) => {
       try {
         const parsed = JSON.parse(json);
-
-        if (parsed?.data?.length) {
-          tables.push(this.dataToTable(parsed.data, parsed.title, parsed.summary, parsed.sourceId));
-          return '';
-        }
-
-        if (parsed?.columns?.length && parsed?.rows?.length) {
-          const columns = parsed.columns.filter((c: unknown) => typeof c === 'string');
-          const rows = parsed.rows
-            .filter((r: unknown) => Array.isArray(r) && r.length === columns.length)
-            .map((r: unknown[]) => r.map(this.coerceValue));
-
-          if (columns.length && rows.length) {
-            tables.push({ id: crypto.randomUUID(), columns, rows, title: parsed.title, summary: parsed.summary, sourceId: parsed.sourceId });
-          }
+        if (Array.isArray(parsed) && parsed.length) {
+          tables.push(this.dataToTable(parsed));
           return '';
         }
       } catch {
@@ -160,7 +153,7 @@ export class ApiService {
         .map(cells => cells.map(this.coerceValue));
 
       if (columns.length && rows.length) {
-        tables.push({id: crypto.randomUUID(), columns, rows});
+        tables.push({ id: crypto.randomUUID(), columns, rows });
         text = text.replace(match[0], '');
       }
     }
@@ -171,7 +164,7 @@ export class ApiService {
   private dataToTable(data: any[], title?: string, summary?: string, sourceId?: string): TableData {
     const columns = Object.keys(data[0]);
     const rows = data.map(item => columns.map(col => this.coerceValue(item[col])));
-    return {id: crypto.randomUUID(), columns, rows, title, summary, sourceId};
+    return { id: crypto.randomUUID(), columns, rows, title, summary, sourceId };
   }
 
   private coerceValue = (value: unknown): TableCellValue => {
@@ -188,3 +181,6 @@ export class ApiService {
       : String(value);
   }
 }
+
+
+
