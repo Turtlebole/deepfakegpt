@@ -9,21 +9,26 @@
       @case ('special') {
         <markdown class="markdown-content" [data]="message.message"></markdown>
 
-        @for (chart of getCharts(); track chart.title) {
-          <div class="chart-container mt-4">
-            <p class="font-semibold mb-2">{{ chart.title }}</p>
-            <pre class="text-xs mt-2">{{ chart.data | json }}</pre>
+        @for (chart of getCharts(); track $index; let i = $index) {
+          <div class="chart-container mt-4 p-4 bg-white rounded-lg shadow-sm">
+            <canvas baseChart
+              [type]="getChartConfig(chart, i).type"
+              [data]="getChartConfig(chart, i).data"
+              [options]="getChartConfig(chart, i).options">
+            </canvas>
           </div>
         }
 
         @for (table of getTables(); track table.id) {
           <app-data-table [table]="table"/>
         }
+
       }
       @default {
         <markdown class="markdown-content" [data]="message.message"></markdown>
       }
     }
+
   </div>
 </div>
 

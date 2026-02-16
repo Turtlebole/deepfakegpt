@@ -1,8 +1,11 @@
 ﻿import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MarkdownModule } from 'ngx-markdown';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration } from 'chart.js';
 import { ChatMessage, ChartData, TableData } from '../chat.models';
 import { DataTableComponent } from './data-table/data-table';
+import { createChartConfig } from '../../../common/utils/chart.utils';
 
 type ContentType = 'user' | 'special' | 'text';
 
@@ -11,15 +14,18 @@ const TYPE_REGEX = /<(chart|table)>([\s\S]*?)<\/\1>/gi;
 @Component({
   selector: 'app-data-chart',
   standalone: true,
-  imports: [CommonModule, MarkdownModule, DataTableComponent],
+  imports: [CommonModule, MarkdownModule, DataTableComponent, BaseChartDirective],
   templateUrl: './chat-interface-renderer.html',
   styleUrl: './chat-interface-renderer.css'
 })
 export class DataChartComponent {
   @Input({ required: true }) message!: ChatMessage;
 
-  charts: ChartData[] = [];
-  tables: TableData[] = [];
+  private charts: ChartData[] = [];
+  private tables: TableData[] = [];
+  private chartConfigs: Map<string, ChartConfiguration> = new Map();
+  private lastMessageId: string = '';
+  private contentParsed = false;
 
   getContentType(): ContentType {
     if (this.message.role === 'user') {
@@ -34,13 +40,21 @@ export class DataChartComponent {
   }
 
   parseSpecialContent(): void {
+    if (this.message.id === this.lastMessageId && this.contentParsed) {
+      return;
+    }
+
+    this.lastMessageId = this.message.id;
+    this.contentParsed = true;
+    this.chartConfigs.clear();
+
     this.charts = [...(this.message.charts || [])];
     this.tables = [...(this.message.tables || [])];
 
     const regex = new RegExp(TYPE_REGEX);
-    let match: RegExpExecArray | null;
+    const matches = [...this.message.message.matchAll(regex)];
 
-    while ((match = regex.exec(this.message.message)) !== null) {
+    for (const match of matches) {
       const contentType = match[1].toLowerCase() as 'chart' | 'table';
       const jsonContent = match[2].trim();
 
@@ -67,25 +81,41 @@ export class DataChartComponent {
             });
             break;
           default:
-            console.warn(`no clue which file type is received: ${contentType}`);
+            console.warn(`what type did i get here o0: ${contentType}`);
         }
-      } catch (error) {
-        console.error(`parsing failed ${contentType}:`, error);
+      } catch (e) {
+        console.error(`parse fail ${contentType} data:`, e);
       }
     }
+
+    this.charts.forEach((chart, index) => {
+      this.chartConfigs.set(`${chart.title}-${index}`, createChartConfig(chart));
+    });
   }
 
   getCharts(): ChartData[] {
-    if (this.charts.length === 0 && this.getContentType() === 'special') {
+    if (!this.contentParsed || this.message.id !== this.lastMessageId) {
       this.parseSpecialContent();
     }
     return this.charts;
   }
 
   getTables(): TableData[] {
-    if (this.tables.length === 0 && this.getContentType() === 'special') {
+    if (!this.contentParsed || this.message.id !== this.lastMessageId) {
       this.parseSpecialContent();
     }
     return this.tables;
+  }
+
+  getChartConfig(chart: ChartData, index: number): ChartConfiguration {
+    const key = `${chart.title}-${index}`;
+    const cached = this.chartConfigs.get(key);
+    if (cached) {
+      return cached;
+    }
+
+    const config = createChartConfig(chart);
+    this.chartConfigs.set(key, config);
+    return config;
   }
 }
