@@ -7,7 +7,7 @@ import { TableData } from '../../chat.models';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './data-table.html',
-  styleUrl: './data-table.css'
+  styleUrl: './data-table.scss'
 })
 export class DataTableComponent {
   @Input({ required: true }) table!: TableData;

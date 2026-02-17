@@ -8,7 +8,7 @@ import { ChatHistoryService } from '../../../common/services/chat-history.servic
   standalone: true,
   imports: [CommonModule, MatIconModule],
   templateUrl: './chat-history.html',
-  styleUrl: './chat-history.css'
+  styleUrl: './chat-history.scss'
 })
 export class ChatHistoryComponent {
   private readonly chatHistory = inject(ChatHistoryService);

@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import { Navbar } from './common/components/navbar/navbar';
+import { ChatDrawer } from './components/chat-drawer/chat-drawer';
+import {ChatInterface} from './components/chat-drawer/chat-interface/chat-interface';
 
 @Component({
   selector: 'app-root',
-  imports: [Navbar],
+  imports: [ChatDrawer, ChatInterface],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.scss'
 })
 export class App {}

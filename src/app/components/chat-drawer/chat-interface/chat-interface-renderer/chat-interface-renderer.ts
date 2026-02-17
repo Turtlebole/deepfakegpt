@@ -5,7 +5,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration } from 'chart.js';
 import { ChatMessage, ChartData, TableData } from '../chat.models';
 import { DataTableComponent } from './data-table/data-table';
-import { createChartConfig } from '../../../common/utils/chart.utils';
+import { createChartConfig } from '../../../../common/utils/chart.utils';
 
 type ContentType = 'user' | 'special' | 'text';
 
@@ -16,10 +16,10 @@ const TYPE_REGEX = /<(chart|table)>([\s\S]*?)<\/\1>/gi;
   standalone: true,
   imports: [CommonModule, MarkdownModule, DataTableComponent, BaseChartDirective],
   templateUrl: './chat-interface-renderer.html',
-  styleUrl: './chat-interface-renderer.css'
+  styleUrl: './chat-interface-renderer.scss'
 })
 export class DataChartComponent {
-  @Input({ required: true }) message!: ChatMessage;
+  @Input({ required: true }) message!: ChatMessage; // FIXME: signal
 
   private charts: ChartData[] = [];
   private tables: TableData[] = [];
@@ -97,6 +97,7 @@ export class DataChartComponent {
     if (!this.contentParsed || this.message.id !== this.lastMessageId) {
       this.parseSpecialContent();
     }
+
     return this.charts;
   }
 
@@ -104,6 +105,7 @@ export class DataChartComponent {
     if (!this.contentParsed || this.message.id !== this.lastMessageId) {
       this.parseSpecialContent();
     }
+
     return this.tables;
   }
 

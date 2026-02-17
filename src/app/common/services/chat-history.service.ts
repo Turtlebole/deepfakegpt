@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { Conversation, ChatMessage } from '../../components/chat-interface/chat.models';
+import { Conversation, ChatMessage } from '../../components/chat-drawer/chat-interface/chat.models';
 import { PromptLibraryService } from './prompt-library.service';
 import { ApiService } from './chat-api.service';
 

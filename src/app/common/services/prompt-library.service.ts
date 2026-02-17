@@ -1,5 +1,5 @@
 import {Injectable, signal} from '@angular/core';
-import {ChatMessage} from '../../components/chat-interface/chat.models';
+import {ChatMessage, MessageRole} from '../../components/chat-drawer/chat-interface/chat.models';
 
 export interface PredefinedPrompt {
   id: string;
@@ -12,10 +12,10 @@ export interface PredefinedPrompt {
   providedIn: 'root'
 })
 export class PromptLibraryService {
-  private readonly prompts = signal<PredefinedPrompt[]>([]);
+  private readonly prompts = signal<divredefinedPrompt[]>([]);
 
   constructor() {
-    const p1Id = crypto.randomUUID();
+    const p1Id = 'a1b2c3d4-e5f6-7890-1111-222233334444';
     const p2Id = crypto.randomUUID();
     const p3Id = crypto.randomUUID();
 
@@ -88,14 +88,14 @@ export class PromptLibraryService {
         message: prompt.question,
         timestamp: new Date(),
         isUser: true,
-        role: 'user'
+        role: MessageRole.User
       },
       {
         id: crypto.randomUUID(),
         message: prompt.answer,
         timestamp: new Date(),
         isUser: false,
-        role: 'assistant',
+        role: MessageRole.Assistant,
         charts: [],
         tables: []
       }

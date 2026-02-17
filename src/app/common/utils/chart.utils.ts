@@ -1,5 +1,5 @@
 import { ChartConfiguration } from 'chart.js';
-import { ChartData } from '../../components/chat-interface/chat.models';
+import { ChartData } from '../../components/chat-drawer/chat-interface/chat.models';
 
 const PRIMARY_COLOR = '#AF4A4A';
 

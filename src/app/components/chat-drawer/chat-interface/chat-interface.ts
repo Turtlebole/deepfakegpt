@@ -1,37 +1,39 @@
-import {Component, inject, signal, OnDestroy, effect} from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {Component, DestroyRef, effect, inject, signal} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { finalize, map, scan, filter } from 'rxjs/operators';
-import { Router, NavigationEnd } from '@angular/router';
-import { Subscription } from 'rxjs';
+import {MatIconModule} from '@angular/material/icon';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {finalize, map, scan} from 'rxjs/operators';
+import {ActivatedRoute, Router} from '@angular/router';
 
-import { ApiService } from '../../common/services/chat-api.service';
-import { ChatHistoryService } from '../../common/services/chat-history.service';
-import { ChatMessage } from './chat.models';
-import { DataChartComponent } from './chat-interface-renderer/chat-interface-renderer';
-import { ChatHistoryComponent } from './chat-history/chat-history';
-import { noWhitespaceValidator } from '../../common/utils/validators';
+import {ApiService} from '../../../common/services/chat-api.service';
+import {ChatHistoryService} from '../../../common/services/chat-history.service';
+import {ChatMessage, MessageRole} from './chat.models';
+import {DataChartComponent} from './chat-interface-renderer/chat-interface-renderer';
+import {ChatHistoryComponent} from '../chat-history/chat-history';
+import {noWhitespaceValidator} from '../../../common/utils/validators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-chat-interface',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatProgressSpinnerModule, DataChartComponent, ChatHistoryComponent],
   templateUrl: './chat-interface.html',
-  styleUrl: './chat-interface.css',
+  styleUrl: './chat-interface.scss',
 })
 
-export class ChatInterface implements OnDestroy {
+export class ChatInterface {
   private readonly api = inject(ApiService);
   private readonly chatHistory = inject(ChatHistoryService);
   private readonly router = inject(Router);
-  private subscriptions = new Subscription();
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly userInput = new FormControl('', { validators: [Validators.required, noWhitespaceValidator] });
   protected readonly isLoading = signal(false);
   protected readonly messages = signal<ChatMessage[]>([]);
   protected readonly showHistory = signal(false);
+  protected readonly chatGuid = signal<string | null>(null);
 
   constructor() {
     effect(() => {
@@ -41,20 +43,16 @@ export class ChatInterface implements OnDestroy {
       }
     });
 
-    const routerSub = this.router.events.pipe(
-      map(event => {
-        if (event instanceof NavigationEnd) {
-          const urlSegments = event.url.split('/');
-          return urlSegments[urlSegments.length - 1];
-        }
-        return null;
-      }),
-      filter((id): id is string => !!id && id !== 'chat' && id.includes('-')),
-    ).subscribe(id => {
-      this.chatHistory.setActiveConversation(id);
-    });
+    this.route.paramMap.pipe(
+      takeUntilDestroyed(),
+    ).subscribe((params) => {
+      const guid = params.get('guid');
+      if (!guid) {
+        return;
+      }
 
-    this.subscriptions.add(routerSub);
+      this.chatGuid.set(guid);
+    });
 
     const activeId = this.chatHistory.activeConversationId();
     if (activeId) {
@@ -64,12 +62,8 @@ export class ChatInterface implements OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
-
   private updateUrlWithConversationId(id: string): void {
-    this.router.navigate(['/chat', id], { replaceUrl: true });
+    // this.router.navigate(['/chat', id], { replaceUrl: true });
   }
 
   private createNewConversation(): void {
@@ -89,7 +83,7 @@ export class ChatInterface implements OnDestroy {
       message: messageText,
       timestamp: new Date(),
       isUser: true,
-      role: 'user'
+      role: MessageRole.User
     };
 
     this.chatHistory.addMessageToActiveConversation(userMessage);
@@ -102,7 +96,7 @@ export class ChatInterface implements OnDestroy {
       message: '',
       timestamp: new Date(),
       isUser: false,
-      role: 'assistant',
+      role: MessageRole.Assistant,
       charts: [],
       tables: []
     };
@@ -112,7 +106,8 @@ export class ChatInterface implements OnDestroy {
     this.api.streamMessage(messageText).pipe(
       scan((fullText, chunk) => fullText + chunk, ''),
       map(fullText => this.api.parseContent(fullText)),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)),
+      takeUntilDestroyed(this.destroyRef),
     ).subscribe((parsed) => {
       const activeId = this.chatHistory.activeConversationId();
       if (!activeId) return;
