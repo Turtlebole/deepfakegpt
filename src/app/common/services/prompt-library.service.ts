@@ -12,7 +12,7 @@ export interface PredefinedPrompt {
   providedIn: 'root'
 })
 export class PromptLibraryService {
-  private readonly prompts = signal<divredefinedPrompt[]>([]);
+  private readonly prompts = signal<PredefinedPrompt[]>([]);
 
   constructor() {
     const p1Id = 'a1b2c3d4-e5f6-7890-1111-222233334444';
