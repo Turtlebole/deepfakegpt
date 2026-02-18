@@ -1,26 +1,30 @@
-﻿import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MarkdownModule } from 'ngx-markdown';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration } from 'chart.js';
-import { ChatMessage, ChartData, TableData } from '../chat.models';
-import { DataTableComponent } from './data-table/data-table';
-import { createChartConfig } from '../../../../common/utils/chart.utils';
-
-type ContentType = 'user' | 'special' | 'text';
+﻿import {Component, Input, signal} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {MarkdownModule} from 'ngx-markdown';
+import {BaseChartDirective} from 'ng2-charts';
+import {ChartConfiguration} from 'chart.js';
+import {ChartData, ChatMessage, MessageRole, TableData} from '../chat.models';
+import {DataTableComponent} from './data-table/data-table';
+import {createChartConfig} from '../../../../common/utils/chart.utils';
+import {ContentType} from '../chat.models';
 
 const TYPE_REGEX = /<(chart|table)>([\s\S]*?)<\/\1>/gi;
 
 @Component({
-  selector: 'app-data-chart',
+  selector: 'app-interface-renderer',
   standalone: true,
   imports: [CommonModule, MarkdownModule, DataTableComponent, BaseChartDirective],
   templateUrl: './chat-interface-renderer.html',
   styleUrl: './chat-interface-renderer.scss'
 })
 export class DataChartComponent {
-  @Input({ required: true }) message!: ChatMessage; // FIXME: signal
 
+  private readonly messageSignal = signal<ChatMessage | null>(null);
+
+  @Input({ required: true })
+  set message(value: ChatMessage) { this.messageSignal.set(value); }
+
+  get message(): ChatMessage { return this.messageSignal()!; }
   private charts: ChartData[] = [];
   private tables: TableData[] = [];
   private chartConfigs: Map<string, ChartConfiguration> = new Map();
@@ -28,15 +32,15 @@ export class DataChartComponent {
   private contentParsed = false;
 
   getContentType(): ContentType {
-    if (this.message.role === 'user') {
-      return 'user';
+    if (this.message.role === MessageRole.User) {
+      return ContentType.User;
     }
 
     if (this.message.charts?.length || this.message.tables?.length || TYPE_REGEX.test(this.message.message)) {
-      return 'special';
+      return ContentType.Special;
     }
 
-    return 'text';
+    return ContentType.Text;
   }
 
   parseSpecialContent(): void {
@@ -62,15 +66,15 @@ export class DataChartComponent {
         const parsedData = JSON.parse(jsonContent);
 
         switch (contentType) {
-          case 'chart':
+          case ContentType.Chart:
             this.charts.push({
               type: parsedData.type || 'bar',
-              title: parsedData.title || 'Chart',
+              title: parsedData.title || ContentType.Chart,
               data: parsedData.data || []
             });
             break;
 
-          case 'table':
+          case ContentType.Table:
             this.tables.push({
               id: parsedData.id || crypto.randomUUID(),
               columns: parsedData.columns || [],
@@ -80,11 +84,10 @@ export class DataChartComponent {
               sourceId: parsedData.sourceId
             });
             break;
+
           default:
-            console.warn(`what type did i get here o0: ${contentType}`);
         }
       } catch (e) {
-        console.error(`parse fail ${contentType} data:`, e);
       }
     }
 
@@ -119,5 +122,12 @@ export class DataChartComponent {
     const config = createChartConfig(chart);
     this.chartConfigs.set(key, config);
     return config;
+  }
+
+  protected readonly MessageRole = MessageRole;
+  protected readonly ContentType = ContentType;
+
+  constructor() {
+    void this.MessageRole;
   }
 }

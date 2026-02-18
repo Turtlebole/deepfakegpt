@@ -61,7 +61,7 @@ export class ChatHistoryService {
   }
 
   updateConversationMessages(conversationId: string, messages: ChatMessage[]): void {
-    this.conversations.update(conversations =>
+    this.conversations.update((conversations) =>
       conversations.map(conversation =>
         conversation.id === conversationId
           ? { ...conversation, messages, updatedAt: new Date() }
@@ -73,14 +73,14 @@ export class ChatHistoryService {
   private initializeWithPredefinedPrompts(): void {
     const prompts = this.promptLibrary.getPromptsValue();
 
-    const predefinedConversations: Conversation[] = prompts.map(prompt => {
+    const predefinedConversations: Conversation[] = prompts.map((prompt) => {
       const rawMessages = this.promptLibrary.getMessagesForPrompt(prompt.id);
-      const messages: ChatMessage[] = rawMessages.map(msg => {
-        if (!msg.isUser && msg.message) {
-          const parsed = this.api.parseContent(msg.message);
-          return { ...msg, message: parsed.text, charts: parsed.charts || [], tables: parsed.tables || [] };
+      const messages: ChatMessage[] = rawMessages.map((message) => {
+        if (!message.isUser && message.message) {
+          const parsed = this.api.parseContent(message.message);
+          return { ...message, message: parsed.text, charts: parsed.charts || [], tables: parsed.tables || [] };
         }
-        return msg;
+        return message;
       });
 
       const conversationDate = new Date();

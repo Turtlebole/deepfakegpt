@@ -20,10 +20,17 @@ export interface TableData {
     sourceId?: string;
 }
 
-// Use an enum for message roles so callers can use MessageRole. User, etc.
 export enum MessageRole {
     User = 'user',
     Assistant = 'assistant',
+}
+
+export enum ContentType {
+  Chart = 'chart',
+  Table = 'table',
+  Text = 'text',
+  User = 'user',
+  Special = 'special',
 }
 
 export interface ChatMessage {

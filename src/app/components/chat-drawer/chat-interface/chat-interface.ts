@@ -25,7 +25,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 export class ChatInterface {
   private readonly api = inject(ApiService);
   private readonly chatHistory = inject(ChatHistoryService);
-  private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -36,6 +35,18 @@ export class ChatInterface {
   protected readonly chatGuid = signal<string | null>(null);
 
   constructor() {
+    try {
+      console.debug('[ChatInterface] conversations', this.chatHistory.conversations());
+      console.debug('[ChatInterface] activeConversationId', this.chatHistory.activeConversationId());
+      console.debug('[ChatInterface] activeConversation', this.chatHistory.activeConversation());
+    } catch (e) {
+    }
+
+    const initialActive = this.chatHistory.activeConversation();
+    if (initialActive) {
+      this.messages.set(initialActive.messages || []);
+    }
+
     effect(() => {
       const activeConversation = this.chatHistory.activeConversation();
       if (activeConversation) {
@@ -63,7 +74,6 @@ export class ChatInterface {
   }
 
   private updateUrlWithConversationId(id: string): void {
-    // this.router.navigate(['/chat', id], { replaceUrl: true });
   }
 
   private createNewConversation(): void {
@@ -115,7 +125,7 @@ export class ChatInterface {
       const conversation = this.chatHistory.conversations().find(c => c.id === activeId);
       if (!conversation) return;
 
-      const updatedMessages = conversation.messages.map(message =>
+      const updatedMessages = conversation.messages.map((message) =>
         message.id === botId
           ? { ...message, message: parsed.text, charts: parsed.charts, tables: parsed.tables }
           : message
@@ -132,10 +142,10 @@ export class ChatInterface {
   }
 
   toggleHistory(): void {
-    const currently = this.showHistory();
-    if (!currently) {
-      const activeId = this.chatHistory.activeConversationId();
-      if (!activeId) {
+    const currentChat = this.showHistory();
+    if (!currentChat) {
+      const activeChatId = this.chatHistory.activeConversationId();
+      if (!activeChatId) {
         this.createNewConversation();
       }
     }

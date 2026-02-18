@@ -29,7 +29,7 @@
         </div>
       }
       @for (message of messages(); track message.id) {
-        <app-data-chart [message]="message"/>
+        <app-interface-renderer [message]="message"/>
       }
       @if (isLoading()) {
         <div class="flex py-2">
