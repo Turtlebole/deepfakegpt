@@ -1,0 +1,46 @@
+﻿<div class="h-full flex flex-col bg-[var(--bg-secondary)] border-l border-[var(--border)]">
+  <div class="px-4 py-4 border-b border-[var(--border)] flex items-center gap-3">
+    <button
+      (click)="onBackClick()"
+      class="w-10 h-10 rounded-full bg-[var(--accent)]/10 hover:bg-[var(--accent)]/20 flex items-center justify-center">
+      <mat-icon class="text-[var(--accent)]">arrow_back</mat-icon>
+    </button>
+
+    <div class="flex items-center gap-2 flex-1">
+      <h3 class="text-base font-semibold text-[var(--text-primary)]">Previous Chats</h3>
+    </div>
+  </div>
+
+  <div class="px-4 py-3 border-b border-[var(--border)]">
+    <button
+      (click)="createNewChat()"
+      class="w-full flex items-center gap-3 px-4 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-dark)]">
+      <span class="text-sm font-medium">New Chat</span>
+    </button>
+  </div>
+
+  <div class="flex-1 overflow-auto px-3 py-4">
+    @if (conversations().length > 0) {
+      <div class="space-y-1">
+        @for (conversation of conversations(); track conversation.id) {
+          <div
+            (click)="selectConversation(conversation.id)"
+            class="group flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition"
+            [ngClass]="{
+              'bg-[var(--accent)]/10 text-[var(--accent)]': activeConversationId() === conversation.id,
+              'hover:bg-[var(--bg-card)] text-[var(--text-secondary)]': activeConversationId() !== conversation.id
+            }">
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium truncate">{{ conversation.title }}</div>
+              <div class="text-xs opacity-70">{{ conversation.updatedAt | date:'short' }}</div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="flex flex-col items-center justify-center h-full text-center px-4">
+        <mat-icon class="text-4xl text-[var(--text-muted)] mb-3">chat_bubble_outline</mat-icon>
+      </div>
+    }
+  </div>
+</div>

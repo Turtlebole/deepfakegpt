@@ -1,0 +1,34 @@
+<div>test</div>
+<div class="flex" [ngClass]="{ 'justify-end': message.role === 'user' }">
+  <div class="max-w-[85%] px-4 py-3.5 rounded-2xl"
+       [ngClass]="{ 'bg-[var(--accent)] text-white rounded-br-sm': message.role === 'user' }">
+
+    @switch (getContentType()) {
+      @case (ContentType.User) {
+        <div class="leading-relaxed text-[1rem] break-words">{{ message.message }}</div>
+      }
+      @case (ContentType.Special) {
+        <markdown class="markdown-content" [data]="message.message"></markdown>
+
+        @for (chart of getCharts(); track $index; let i = $index) {
+          <div class="chart-container mt-4 p-4 bg-white rounded-lg shadow-sm">
+            <canvas baseChart
+              [type]="getChartConfig(chart, i).type"
+              [data]="getChartConfig(chart, i).data"
+              [options]="getChartConfig(chart, i).options">
+            </canvas>
+          </div>
+        }
+
+        @for (table of getTables(); track table.id) {
+          <app-data-table [table]="table"/>
+        }
+
+      }
+      @default {
+        <markdown class="markdown-content" [data]="message.message"></markdown>
+      }
+    }
+  </div>
+</div>
+

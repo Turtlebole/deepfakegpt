@@ -20,11 +20,25 @@ export interface TableData {
     sourceId?: string;
 }
 
+export enum MessageRole {
+    User = 'user',
+    Assistant = 'assistant',
+}
+
+export enum ContentType {
+  Chart = 'chart',
+  Table = 'table',
+  Text = 'text',
+  User = 'user',
+  Special = 'special',
+}
+
 export interface ChatMessage {
     id: string;
     message: string;
     timestamp: Date;
     isUser: boolean;
+    role: MessageRole;
     charts?: ChartData[];
     tables?: TableData[];
 }

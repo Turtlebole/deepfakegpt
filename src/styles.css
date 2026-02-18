@@ -44,7 +44,7 @@ body::before {
     linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
   background-position: right -1px;
-  background-size: 23px 23px;
+  background-size: 48px 48px;
   mask-image: radial-gradient(circle at 100% 0%, white, transparent 65%);
   -webkit-mask-image: radial-gradient(circle at 100% 0%, white, transparent 65%);
   pointer-events: none;
