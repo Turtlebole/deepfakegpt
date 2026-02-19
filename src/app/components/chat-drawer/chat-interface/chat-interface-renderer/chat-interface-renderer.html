@@ -10,15 +10,7 @@
       @case (ContentType.Special) {
         <markdown class="markdown-content" [data]="message.message"></markdown>
 
-        @for (chart of getCharts(); track $index; let i = $index) {
-          <div class="chart-container mt-4 p-4 bg-white rounded-lg shadow-sm">
-            <canvas baseChart
-              [type]="getChartConfig(chart, i).type"
-              [data]="getChartConfig(chart, i).data"
-              [options]="getChartConfig(chart, i).options">
-            </canvas>
-          </div>
-        }
+        <app-data-chart [charts]="getCharts()" [getChartConfig]="getChartConfig.bind(this)"></app-data-chart>
 
         @for (table of getTables(); track table.id) {
           <app-data-table [table]="table"/>
@@ -31,4 +23,3 @@
     }
   </div>
 </div>
-

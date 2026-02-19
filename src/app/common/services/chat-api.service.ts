@@ -113,7 +113,7 @@ export class ApiService {
         const parsed = JSON.parse(json);
         if (parsed?.data?.length) {
           charts.push({ type: parsed.type || 'bar', title: parsed.title || 'Chart', data: parsed.data });
-          tables.push(this.dataToTable(parsed.data, parsed.title ? `${parsed.title} (Data)` : undefined));
+          tables.push(this.dataToTable(parsed.data, parsed.title ? `${parsed.title}` : undefined));
           return '';
         }
       } catch {

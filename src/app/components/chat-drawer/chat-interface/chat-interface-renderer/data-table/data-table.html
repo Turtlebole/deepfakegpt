@@ -1,1 +1,33 @@
 <div>table is displayed here lol</div>
+
+@if (table) {
+  <div class="pt-4">
+    <div class="data-table-container p-4 bg-white rounded-lg shadow-sm">
+      @if (table.title) {
+        <h3 class="text-lg font-bold text-center text-black pb-2">{{ table.title }}</h3>
+      }
+      <div class="overflow-auto">
+        <table class="min-w-full table-auto border-collapse">
+          <thead>
+          <tr class="bg-gray-100">
+            @for (col of table.columns; track $index) {
+              <th class="px-3 py-2 text-left text-sm font-medium text-gray-700 border-b">{{ col }}</th>
+            }
+          </tr>
+          </thead>
+          <tbody>
+            @for (row of table.rows; track $index) {
+              <tr class="odd:bg-white even:bg-gray-50">
+                @for (cell of row; track $index) {
+                  <td class="px-3 py-2 text-sm text-gray-800 border-b">{{ cell }}</td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="text-sm text-gray-500">nothing rendered</div>
+}

@@ -1,1 +1,9 @@
-<p>data-chart works!</p>
+@for (chart of charts; track $index; let i = $index) {
+  <div class="chart-container mt-4 p-4 bg-white rounded-lg shadow-sm">
+    <canvas baseChart
+            [type]="getChartConfig(chart, i).type"
+            [data]="getChartConfig(chart, i).data"
+            [options]="getChartConfig(chart, i).options">
+    </canvas>
+  </div>
+}
